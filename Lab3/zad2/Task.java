@@ -6,21 +6,23 @@ public class Task implements Runnable{
 	private PrinterMonitor printMonitor;
 	
 	public Task(int taskId, PrinterMonitor printMonitor){
-		System.out.println("Tworzymy zadanie o id " + taskId);
+		System.out.println("Tworzenie zadania o id: " + taskId); //  Utworz_zadanie_do_druku();
+
 		this.taskId = taskId;
 		this.printMonitor = printMonitor;
 	}
 	
 	public void run(){
-		int printerId;																		//do zadania trzeba przypisac konkretna drukarke
-		System.out.println("Zadanie o id " + this.taskId + " - proba rozpoczecia.");
+		int printerId;
+		System.out.println("Zadanie o id " + this.taskId + " - zaczynamy."); //nr_drukarki=Monitor_Drukarek.zarezerwuj();
 		printerId = printMonitor.takePrinter();
-		System.out.println("Zadanie o id " + this.taskId + " - zajelo drukarke o id " + printerId);
+		System.out.println("Zadanie o id " + this.taskId + " drukarka zajeta: " + printerId);  // drukuj(nr_drukarki);
 		try{
-			Thread.sleep(1000);
+			Thread.sleep(500);
 		} catch (InterruptedException e){
 			e.printStackTrace();
 		}
-		printMonitor.releasePrinter(printerId);
+		printMonitor.releasePrinter(printerId); //  Monitor_Drukarek.zwolnij(nr_drukarki);
+
 	}
 }

@@ -1,8 +1,9 @@
 package Lab3.zad2;
 
+import static Lab3.zad2.PrinterMonitor.N;
+
 public class Main {
-	public final static int M = 5;		//liczba drukarek
-	public final static int N = 40;		//liczba watkow
+
 	
 	public static void main (String[] args){
 		PrinterMonitor m = new PrinterMonitor();

@@ -4,29 +4,31 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-//w mainie tworze drukarki 
-//drukarki przekazuje do monitora
-//monitor zarzadza drukarkami
+
 
 public class PrinterMonitor {
+
+    public final static int M = 2;		//liczba drukarek
+    public final static int N = 10;		//liczba watkow
+
 	final Lock lock = new ReentrantLock();
 	final Condition freePrinters = lock.newCondition();
 		
-	private boolean [] printerTab = new boolean[Main.M]; 		//okresla ktore drukarki sa zajete - jesli true to drukarka o id == indeksowi jest zajeta
-	private int counter = 0;										// = Main.M;  // okresla liczbe zajetych drukarek
+	private boolean [] printerTaken = new boolean[M]; 		//sluzy do oznaczenia zajetych drukarek
+	private int counter = 0;										// zliczanie zajetych drukarek
 	
 	public PrinterMonitor(){
-		for (int i = 0; i < Main.M; i++)
-			printerTab[i] = false;								//ustawiamy drukarki na niezajete 
+		for (int i = 0; i < M; i++)
+			printerTaken[i] = false;
 	}
 	
 	//zwraca id drukarki
 	public int takePrinter(){		
 		lock.lock();
 		try {
-			while(counter == printerTab.length){			//dopoki wszystkie drukarki zajete
+			while(counter == printerTaken.length){			//dopoki wszystkie drukarki zajete
 				freePrinters.await();						//czekaj na warunek freePrinters
-				System.out.println("Czekamy na wolna drukarke.");
+				System.out.println("Oczekiwanie na wolną drukarke.");
 			}
 					
 		}catch (InterruptedException e) {
@@ -36,15 +38,15 @@ public class PrinterMonitor {
 		counter++;
 		int index = -1;
 		//szukamy wolnej drukarki
-		for(int i = 0; i < Main.M; i++){			 
-			if(printerTab[i] == false){
-				printerTab[i] = true;				//zajmujemy drukarke
+		for(int i = 0; i < M; i++){
+			if(printerTaken[i] == false){
+				printerTaken[i] = true;				//zajmujemy drukarke
 				index = i;							//zaznaczamy ktora drukarke zajelismy
 				break;
 			}					
 		}
 		if(index == -1)
-			System.out.println("Cos poszlo nie tak");
+			System.out.println("ERROR zajmowania drukarki");
 			
 		lock.unlock();
 		return index;								//zwracamy index rowny numerowi zajetej drukarki
@@ -54,10 +56,12 @@ public class PrinterMonitor {
 	public void releasePrinter(int id){
 		lock.lock();
 		counter--;
-		if(printerTab[id] == false)
-			System.out.println("Cos poszlo nie tak");
-		printerTab[id] = false;
-		freePrinters.signal();						//
-		lock.unlock();
+		if(printerTaken[id] == false)
+			System.out.println("ERROR, Zwalnianie wolnej drukarki");
+		printerTaken[id] = false;
+		freePrinters.signal();
+        System.out.println("Zwalnianie drukarki o id "+ id);
+
+        lock.unlock();
 	}
 }
